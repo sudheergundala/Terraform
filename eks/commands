@@ -1,0 +1,13 @@
+terraform init
+terraform fmt
+terraform validate
+terraform plan
+terraform apply
+terraform destroy
+terraform state refresh  --- 
+terraform state import  --- 
+terraform state mv <aws_instance.old> <aws_instance.new> --- rename or move resources without recreating.
+terraform state rm <aws_instance.app> --- stops terraform from managing a mentioned resource. 
+terraform state list  --- Terraform shows everything it thinks it manages.
+terraform state show <aws_instance.app> --- It shows the mention resource's attributes from that statefile.
+
