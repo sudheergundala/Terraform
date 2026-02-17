@@ -8,12 +8,12 @@ Instead of manually creating infrastructure in AWS Console, Azure Portal, or GCP
 
 ### 🚀 Why Do We Use Terraform?
       Terraform is widely used in production environments for the following reasons:
-   1️⃣ Multi-Cloud Support
-      Terraform supports multiple cloud providers like:
-      Amazon Web Services
-      Microsoft Azure
-      Google Cloud Platform
-      This allows organizations to manage infrastructure across different clouds using a single tool.
+       1️⃣ Multi-Cloud Support
+         Terraform supports multiple cloud providers like:
+         Amazon Web Services
+         Microsoft Azure
+         Google Cloud Platform
+         This allows organizations to manage infrastructure across different clouds using a single tool.
    2️⃣ Infrastructure as Code (Declarative)
       Infrastructure is defined in code.
       Code is stored in a centralized version control system (Git).
