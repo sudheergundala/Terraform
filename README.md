@@ -66,81 +66,100 @@ Instead of manually creating infrastructure in AWS Console, Azure Portal, or GCP
 ### 🔌 Providers
 
    Terraform itself does nothing without Providers.
+
       Providers:
-      Are plugins
-      Interact with cloud APIs
-      Manage lifecycle of resources
+
+         Are plugins
+         Interact with cloud APIs
+         Manage lifecycle of resources
+
       Example:
-      provider "aws" {
-      region = "us-east-1"
-      }
+
+         provider "aws" {
+         region = "us-east-1"
+         }
+
       Under the hood, providers communicate with cloud APIs (like AWS APIs).
+
       🔐 Authentication Best Practices
-      ❌ Never hardcode AWS credentials.
-      ✅ Always use:
-      IAM Roles
-      AWS_PROFILE
-      OIDC (for CI/CD pipelines)
-⚙️ Terraform Init – What Actually Happens?
-      When you run:
-      terraform init
-      Terraform will:
-      Download provider plugins
-      Initialize backend
-      Set up working directory
-      Important:
-      Providers are downloaded but NOT authenticated yet.
-      Backend initialization happens BEFORE providers are used.
-      Backend configuration must be static.
-   🗄 Terraform Backend Configuration
-      Example:
-      terraform {
-      backend "s3" {
-         bucket         = "org-terraform-state"
-         key            = "prod/eks.tfstate"
-         region         = "us-east-1"
-         dynamodb_table = "terraform-locks"
-         encrypt        = true
-      }
-      }
+
+         ❌ Never hardcode AWS credentials.
+         ✅ Always use:
+         IAM Roles
+         AWS_PROFILE
+         OIDC (for CI/CD pipelines)
+
+### ⚙️ Terraform Init – What Actually Happens?
+
+      When you run terraform init, Terraform will:
+
+         Download provider plugins
+         Initialize backend
+         Set up working directory
+         Important:
+         Providers are downloaded but NOT authenticated yet.
+         Backend initialization happens BEFORE providers are used.
+         Backend configuration must be static.
+
+     🗄 Terraform Backend Configuration
+
+       Example:
+      
+         terraform {
+         backend "s3" {
+            bucket         = "org-terraform-state"
+            key            = "prod/eks.tfstate"
+            region         = "us-east-1"
+            dynamodb_table = "terraform-locks"
+            encrypt        = true
+         }
+         }
 ### ❓ Problem
-   The S3 bucket and DynamoDB table must already exist.
-   So how are they created?
+         The S3 bucket and DynamoDB table must already exist.
+         So how are they created?
 ## 🏗 Bootstrap Solution
    Yes — Terraform creates them.
    But not in the same project.
    We create a separate bootstrap project.
-# 🔁 How Bootstrap Works
-   Step 1: Create Bootstrap Project
-      Contains:
-      main.tf
-      variables.tf
-      This project creates:
-      S3 bucket
-      DynamoDB table
-   Step 2: Use Local State Initially
-      Bootstrap runs using local state (terraform.tfstate)
-      terraform init
-      terraform apply
-      At this point:
-      Backend = local
-      State = local file
-      S3 + DynamoDB get created
-      This happens once at organization level.
-   Step 3: Configure Remote Backend in Other Projects
-      Now other projects can use:
-      backend "s3" {
-      bucket         = "org-terraform-state"
-      key            = "dev/vpc.tfstate"
-      region         = "us-east-1"
-      dynamodb_table = "terraform-locks"
-      }
-      Each environment uses different key:
-      dev/vpc.tfstate
-      prod/eks.tfstate
-      staging/app.tfstate
-      Same bucket, different state files.
+### 🔁 How Bootstrap Works
+
+         Step 1: Create Bootstrap Project
+
+            Contains:
+            main.tf
+            variables.tf
+            This project creates:
+            S3 bucket
+            DynamoDB table
+
+         Step 2: Use Local State Initially
+
+            Bootstrap runs using local state (terraform.tfstate)
+            terraform init
+            terraform apply
+            At this point:
+            Backend = local
+            State = local file
+            S3 + DynamoDB get created
+            This happens once at organization level.
+
+         Step 3: Configure Remote Backend in Other Projects
+
+            Now other projects can use:
+            backend "s3" {
+            bucket         = "org-terraform-state"
+            key            = "dev/vpc.tfstate"
+            region         = "us-east-1"
+            dynamodb_table = "terraform-locks"
+            }
+            Each environment uses different key:
+            dev/vpc.tfstate
+            prod/eks.tfstate
+            staging/app.tfstate
+            Same bucket, different state files.
+
 ## ❓ Why Backend Cannot Use Variables?
+
       During terraform init:
       Terraform:
       Does NOT load variables
@@ -157,17 +176,19 @@ Instead of manually creating infrastructure in AWS Console, Azure Portal, or GCP
       But remote state is not configured yet
       Circular dependency
       So backend configuration must be static and resolvable immediately.
+
 ### 📁 Terraform State
-   Terraform state file:
-   Stores resource identities
-   Stores attributes
-   Stores last applied snapshot
-   It is the source of truth for Terraform.
-   Terraform compares:
-   Code
-   State file
-   Real cloud infrastructure
-   Without state → Terraform cannot function properly.
+
+         Terraform state file:
+         Stores resource identities
+         Stores attributes
+         Stores last applied snapshot
+         It is the source of truth for Terraform.
+         Terraform compares:
+         Code
+         State file
+         Real cloud infrastructure
+         Without state → Terraform cannot function properly.
 ### 🔐 Remote State Best Practices (AWS)
          For AWS:
          Use S3 bucket to store state
@@ -222,34 +243,34 @@ Instead of manually creating infrastructure in AWS Console, Azure Portal, or GCP
 ### ❓ Why Does Terraform Query AWS?
          State file is only a snapshot.
          AWS is the real live system.
-   Terraform queries AWS for:
-      1️⃣ Drift Detection
-         Someone may manually modify AWS.
-         If Terraform does not check:
-         State becomes incorrect
-         Infrastructure drift occurs
-      2️⃣ Safety Before Changes
-         Terraform checks current live attributes.
-         Then decides:
-         In-place update
-         Destroy and recreate
-      3️⃣ Dependency Graph Accuracy
-         Dependencies can change dynamically.
-         Example:
-         aws_subnet.private
-               |
-         aws_network_interface.eni-123
-               |
-         aws_instance.app
-         Terraform queries AWS to understand real relationships before updating.
-      4️⃣ Import & Partial Knowledge
-         Terraform does not know:
-         AWS default values
-         Imported resources
-         Dynamic attachments
-        Querying AWS allows Terraform to:
-         Populate missing attributes
-         Normalize real infrastructure into state
+       Terraform queries AWS for:
+         1️⃣ Drift Detection
+            Someone may manually modify AWS.
+            If Terraform does not check:
+            State becomes incorrect
+            Infrastructure drift occurs
+         2️⃣ Safety Before Changes
+            Terraform checks current live attributes.
+            Then decides:
+            In-place update
+            Destroy and recreate
+         3️⃣ Dependency Graph Accuracy
+            Dependencies can change dynamically.
+            Example:
+            aws_subnet.private
+                  |
+            aws_network_interface.eni-123
+                  |
+            aws_instance.app
+            Terraform queries AWS to understand real relationships before updating.
+         4️⃣ Import & Partial Knowledge
+            Terraform does not know:
+            AWS default values
+            Imported resources
+            Dynamic attachments
+         Querying AWS allows Terraform to:
+            Populate missing attributes
+            Normalize real infrastructure into state
 ### 📌 Execution Flow Summary
       Stage	What Happens
       init	Backend initialized, providers downloaded
