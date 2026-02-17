@@ -8,47 +8,63 @@ Instead of manually creating infrastructure in AWS Console, Azure Portal, or GCP
 
 ### 🚀 Why Do We Use Terraform?
       Terraform is widely used in production environments for the following reasons:
-       1️⃣ Multi-Cloud Support
+
+      1️⃣ Multi-Cloud Support
+
          Terraform supports multiple cloud providers like:
          Amazon Web Services
          Microsoft Azure
          Google Cloud Platform
          This allows organizations to manage infrastructure across different clouds using a single tool.
-   2️⃣ Infrastructure as Code (Declarative)
-      Infrastructure is defined in code.
-      Code is stored in a centralized version control system (Git).
-      Changes are tracked.
-      Rollbacks are possible.
-      Peer reviews are enabled.
-      Terraform is declarative, meaning:
-      You define what you want.
-      Terraform decides how to create it.
-   3️⃣ Consistency & Repeatability
-      Same code → Same infrastructure.
-      No configuration drift between environments.
-      Dev, QA, Prod can be identical.
-   4️⃣ Auditable Code
-      Every infrastructure change is tracked in Git.
-      You know:
-      Who changed it
-      When it was changed
-      What was changed
-   5️⃣ Reusable Modules
-      You can create reusable modules for:
-      VPC
-      EKS
-      IAM
-      ALB
-      Security Groups
-      This promotes standardization across projects.
-   6️⃣ State Management
-      Terraform remembers infrastructure using a state file.
-      Without state, Terraform is blind.
-   7️⃣ Change Preview Before Apply
-      You can run:
-      terraform plan
-      This shows what will change before applying it.
+
+      2️⃣ Infrastructure as Code (Declarative)
+
+         Infrastructure is defined in code.
+         Code is stored in a centralized version control system (Git).
+         Changes are tracked.
+         Rollbacks are possible.
+         Peer reviews are enabled.
+         Terraform is declarative, meaning:
+         You define what you want.
+         Terraform decides how to create it.
+
+      3️⃣ Consistency & Repeatability
+
+         Same code → Same infrastructure.
+         No configuration drift between environments.
+         Dev, QA, Prod can be identical.
+
+      4️⃣ Auditable Code
+
+         Every infrastructure change is tracked in Git.
+         You know:
+         Who changed it
+         When it was changed
+         What was changed
+
+      5️⃣ Reusable Modules
+
+         You can create reusable modules for:
+         VPC
+         EKS
+         IAM
+         ALB
+         Security Groups
+         This promotes standardization across projects.
+
+      6️⃣ State Management
+
+         Terraform remembers infrastructure using a state file.
+         Without state, Terraform is blind.
+
+      7️⃣ Change Preview Before Apply
+
+         You can run:
+         terraform plan
+         This shows what will change before applying it.
+
 ### 🔌 Providers
+
    Terraform itself does nothing without Providers.
       Providers:
       Are plugins
